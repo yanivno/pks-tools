@@ -1,0 +1,18 @@
+releases:
+- name: os-conf
+  version: 21.0.0
+ 
+addons:
+- name: ntp-override
+  jobs:
+  - name: pre-start-script
+    release: os-conf
+    properties:
+      script: |-
+        #!/bin/bash
+        cp /var/vcap/bosh/settings.json /var/vcap/bosh/settings.json.bak
+        sed -i -e 's/\"ntp\":\["192.168.110.10\"\]/\"ntp\"\:\[\"192.168.110.1\"]/g' /var/vcap/bosh/settings.json
+        echo 192.168.110.10 > /var/vcap/bosh/etc/ntpserver
+        /var/vcap/bosh/bin/sync-time
+  include:
+    deployments: ["service-instance_b241af13-e87d-4fbd-8b8b-c02b0b72a795"]
